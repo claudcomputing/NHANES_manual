@@ -1,0 +1,68 @@
+---
+title: "NHANES_Manual_Reproduce"
+author: "Claudia Solis-Roman"
+date: "November 11, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# NHANES Analysis Reproduce Manual
+# Manual for visualizing how the relationship between blood pressure and heart attacks varies by race and age”
+
+This health equity institute manual is intended to serve as a reference for junior analysts on how to perform routine data analyses for the website to help inform health policy. It includes training to help analysts perform some basic data cleaning, analysis, and visualization methods in R.
+
+## Step 0. Environment set up
+```{r}
+if(!requireNamespace("here"))
+  install.packages("here", repos = "https://cloud.r-project.org")
+library("here")
+here::here()
+
+if(!requireNamespace("readstata13"))
+  install.packages("readstata13", repos = "https://cloud.r-project.org")
+library("readstata13")
+
+source(here("src", "script.R"))
+packrat::init
+```
+
+## Step 1. Open Data
+We will use data from the Center for Disease Control's National Health and Nutrition Examination Survey II (NHANES II) for this assignment. A Stata version of this dataset can be found at http://www.stata-press.com/data/r14/nhanes2.dta (here). For the purposes of this analysis,we are not required to use the survey weights.
+
+
+```{r, echo=TRUE}
+nhanes <- read.dta13("http://www.stata-press.com/data/r14/nhanes2.dta")
+var.labels <- attr(data, "var.labels")
+```
+## Step 2. Tables for 5 variables
+
+2. Create a summary table or figure with descriptive statistics for at least 5 variables. Make sure that
+the summaries are appropriate for the type of data being described (e.g. do not use a 5-number
+summary for a binary variable!).
+
+## Step 3. Describe results
+3. Provide a brief description of what the table/figure shows you.
+
+## Step 4. 
+4. Perform an analysis or create a visualization that will be useful to your organization. [Note to
+student: you can use any command that you want as long as (a) it incorporates at least two
+variables and (b) you have never used it before.] Describe why you chose that command (how it
+uses data to inform the mission of the organization) and how you implemented it. Examples of
+types of commands: visualizations (graphs, charts, plots), data sorting, missing data summaries,
+predictive models. Pie charts of any sort are not allowed!
+
+## Step 5. 
+5. Bundle this using packrat as demonstrated by Vicky Steeves.
+
+```{r}
+packrat::bundle
+```
+
+6. Create a title for your manual that is appropriate given what you did, for instance “Manual for
+visualizing how the relationship between blood pressure and heart attacks varies by race”
+
+
