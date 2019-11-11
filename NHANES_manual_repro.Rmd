@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Objective
-This Health Equity Institute of Research (HEIR) manual is intended to serve as a reference for junior analysts on how to perform routine data analyses for the website to help inform health policy for Health Equity Org. It includes training to help analysts like yourself perform some basic data cleaning, analysis, and visualization methods in R. In this manual, we will be producing statistics for our female heart health scorecard, looking closely at women above age 50 and examining how race interacts with high blood pressure and risk for heart attack.
+This Health Equity Institute of Research (HEIR) manual is intended to serve as a reference for junior analysts on how to perform routine data analyses for the website to help inform health policy for Health Equity Org. It includes training to help analysts like yourself perform some basic data cleaning, analysis, and visualization methods in R. In this manual, we will be producing statistics from NHANES for our female heart health scorecard, looking closely at women above age 50 and examining how race interacts with high blood pressure and risk for heart attack.
 
 ## Step 0. Environment set up
 ```{r, results="hide"}
@@ -53,9 +53,7 @@ var.labels <- attr(data, "var.labels")
 We then subselect from he data as a whole using base R to arrive at our population of interest, women over age at or above age 50. 
 
 ```{r}
-nhanes <- nhanes[nhanes$sex==women &nhanes$age>=50]
-
-
+nhanes <- nhanes[nhanes$female==1 & nhanes$age>=50,]
 ```
 
 ## Step 2. Tables for 5 variables
