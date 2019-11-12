@@ -2,7 +2,9 @@
 title: "NHANES_Manual_Reproduce"
 author: "HEIR Analyst Claudia Solis-Roman"
 date: "November 11, 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -18,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This Health Equity Institute of Research (HEIR) manual is intended to serve as a reference for junior analysts on how to perform routine data analyses for the website to help inform health policy for Health Equity Org. It includes training to help analysts like yourself perform some basic data cleaning, analysis, and visualization methods in R. In this manual, we will be producing statistics from NHANES for our female heart health scorecard, looking closely at women above age 50 and examining how race interacts with high blood pressure and risk for heart attack.
 
 ## Step 0. Environment set up
-```{r, results="hide"}
+```{r, echo=TRUE,results="hide"}
 if(!requireNamespace("here"))
   install.packages("here", repos = "https://cloud.r-project.org")
 library("here")
@@ -32,14 +34,9 @@ if(!requireNamespace("readstata13"))
   install.packages("readstata13", repos = "https://cloud.r-project.org")
 library("readstata13")
 
-#if(!requireNamespace("dplyr"))
- # install.packages("dplyr", repos = "https://cloud.r-project.org")
-#library("dplyr")
-
 source(here("src", "script.R"))
 
 packrat::init
-library(c("table1"))
 ```
 
 ## Step 1. Open and Clean Data
@@ -58,37 +55,65 @@ nhanes <- nhanes[nhanes$female==1 & nhanes$age>=50,]
 
 ## Step 2. Tables for 5 variables
 
-2. Create a summary table or figure with descriptive statistics for at least 5 variables. Make sure that
-the summaries are appropriate for the type of data being described (e.g. do not use a 5-number
-summary for a binary variable!).
+2. Create a summary table or figure with descriptive statistics for five variables that relate to heart disease stratified by race. In particular, we generate mean, standard deviation, median, min, max, and cross tabulated frequencies for heart attack, high blood pressure, age, diabetes, and body mass index.
 
 ```{r}
 
 table1::label(nhanes$age) <-"Age"
 table1::label(nhanes$race) <-"Race"
-table1::label(nhanes$hbpressure) <-"High Blood Pressure"
+table1::label(nhanes$highbp) <-"High Blood Pressure"
+table1::label(nhanes$diabetes) <-"Diabetes"
+table1::label(nhanes$bmi) <-"Body Mass Index"
+
 table1::label(nhanes$heartatk) <- "Heart Attack"
 
-table1::table1(~heartatk + hbpressure + age | race,data=nhanes)
+table1(~heartatk + highbp + age + diabetes + bmi| race,data=nhanes)
 
 ```
 
 
 ## Step 3. Describe results
-3. Provide a brief description of what the table/figure shows you.
+3. Provide a brief description of what the table/figure shows you. We recommend an intuitive check to see if your results make sense given your health equity content and knowledge, by practicing guessing at what your output could look like and then investigating what results actually show. Describe your results specifically and use in text figures where possible. While we include minimum and maximum for binary variables in this table as part of our quality checking process, note that this part of the table is not exported into the published scorecard.
+
+Description: In the results contained in Table 1, we see that even though black women, white women, and women of other race/ethnicity groups at or above age 50 have similar average ages (ranging from about 62 to about 63, with standard deviations exceeding their range), white women have the lowest rates of heart attacks (.05 vs. .08). High blood pressure rates are 18 percent higher among black women compared to white women in this sample, and 8 percent higher among other race women compared to white women. Diabetes rates are highest among black women at 13.3%, nearly double those of white women and other women, and while all three race groups have BMI averages within one standard deviation of the "healthy" range, women in other race groups fall within the maximum of the healthy range at 24.5, compared to black and white women (29.2 and 26.4, respectively). We note that the sample size 40 for other race groups is quite small. 
 
 ## Step 4. 
-4. Perform an analysis or create a visualization that will be useful to your organization. [Note to
-student: you can use any command that you want as long as (a) it incorporates at least two
-variables and (b) you have never used it before.] Describe why you chose that command (how it
-uses data to inform the mission of the organization) and how you implemented it. Examples of
-types of commands: visualizations (graphs, charts, plots), data sorting, missing data summaries,
-predictive models. Pie charts of any sort are not allowed!
+4. Perform an equity analysis using a visualization that will be useful to our organization's scorecard reporting on racial disparities in heart disease for women across all ages. Note we are returning to the full data set and subselecting women of all ages to view heart attack risk across all ages. We will be using dplyr and ggplot with colors, as a means to introduce you to two versatile and beloved packages.
+
+
+```{r}
+nhanes <- read.dta13("http://www.stata-press.com/data/r14/nhanes2.dta")
+
+# Subsetting and reshaping the life expectancy data
+subdata <- life_expectancy  %>% 
+    filter (Year=="2000-2005")%>%
+    subset(select=c(Country.or.Area,Subgroup,Value))%>%
+    spread( key = Subgroup, value=Value)
+    
+
+# Taking a look at the first few rows
+head(subdata)
+
+# Plotting male and female life expectancy
+# Adding an abline and changing the scale of axes of the previous plots
+
+ggplot(subdata, aes(x=Male, y=Female))+
+  geom_point(colour="white", fill="chartreuse3", shape=21, alpha=.55, size=5)+
+  geom_abline(intercept = 0, slope = 1, linetype=2)+
+  scale_x_continuous(limits=c(35,85))+
+  scale_y_continuous(limits=c(35,85))+
+  labs(title="Life Expectancy at Birth by Country",
+       subtitle="Years. Period: 2000-2005. Average.",
+       caption="Source: United Nations Statistics Division",
+       x="Males",
+       y="Females")
+```
+
 
 ## Step 5. 
 5. Bundle this using packrat as demonstrated by Vicky Steeves.
 
-```{r}
+```{r, echo=TRUE, results = "hide"}
 packrat::bundle
 ```
 
