@@ -50,7 +50,7 @@ source(here("src", "script.R"))
 packrat::init
 ```
 
-### Step 1. Open and Clean Data
+### Step 1. Open, read in, and subset data for population 
 We will use data from the Center for Disease Control's National Health and Nutrition Examination Survey II (NHANES II) for this assignment. A Stata version of this dataset can be found at http://www.stata-press.com/data/r14/nhanes2.dta (here). For the purposes of this analysis,we are not required to use the survey weights. We use read data 13 to read in Stata 13 data from the online location, save the attributes so we can quickly view the variable labels here in conjunction with NHANES documentation. 
 
 ```{r, echo=TRUE}
@@ -64,7 +64,7 @@ We then subselect from he data as a whole using base R to arrive at our populati
 nhanes <- nhanes[nhanes$female==1 & nhanes$age>=50,]
 ```
 
-### Step 2. Tables for 5 variables
+### Step 2. Create summary NHANES race and heart health statistics table
 
 2. Create a summary table or figure with descriptive statistics for five variables that relate to heart disease stratified by race. In particular, we generate mean, standard deviation, median, min, max, and cross tabulated frequencies for heart attack, high blood pressure, age, diabetes, and body mass index.
 
@@ -83,7 +83,7 @@ table1(~heartatk + highbp + age + diabetes + bmi| race,data=nhanes)
 ```
 
 
-### Step 3. Describe heart health descriptive statistics results
+### Step 3. Describe NHANES heart health variables table
 3. Provide a brief description of what the table/figure shows you. We recommend an intuitive check to see if your results make sense given your health equity content and knowledge, by practicing guessing at what your output could look like and then investigating what results actually show. Describe your results specifically and use in text figures where possible. While we include minimum and maximum for binary variables in this table as part of our quality checking process, note that this part of the table is not exported into the published scorecard.
 
 Description: In the results contained in Table 1, we see that even though black women, white women, and women of other race/ethnicity groups at or above age 50 have similar average ages (ranging from about 62 to about 63, with standard deviations exceeding their range), white women have the lowest rates of heart attacks (.05 vs. .08). High blood pressure rates are 18 percent higher among black women compared to white women in this sample, and 8 percent higher among other race women compared to white women. Diabetes rates are highest among black women at 13.3%, nearly double those of white women and other women, and while all three race groups have BMI averages within one standard deviation of the "healthy" range, women in other race groups fall within the maximum of the healthy range at 24.5, compared to black and white women (29.2 and 26.4, respectively). We note that the sample size 40 for other race groups is quite small. 
@@ -110,15 +110,16 @@ spreaddata <-  metadata %>%
   spread( key = c(race), value=heartatk_rate)
 
 # Plotting female heart attack rate for black and white with age sized dots
-# Adding an abline and changing the scale of axes of the previous plots
+# Add an abline and change the scale of axes to be consistent and show line of equal outcomes
+
 
 ggplot(spreaddata, aes(x=Black, y=White))+
   geom_point(colour="white", fill="chartreuse3", shape=21, alpha=.55, aes(size=age))+
   geom_abline(intercept = 0, slope = 1, linetype=2)+
   scale_x_continuous(limits=c(0,.25))+
   scale_y_continuous(limits=c(0,.25))+
-  labs(title="Heart Attack Rate by Age and Race",
-       #subtitle="Years. Period: 2000-2005. Average.",
+  labs(title="Female Heart Attack Rate by Age and Race",
+       Subtitle="Ages: 50 to 75, Average Rates",
        caption="Source: NHANES",
        x="Black",
        y="White")
@@ -134,7 +135,7 @@ ggplot(spreaddata, aes(x=Black, y=White))+
 packrat::bundle
 ```
 
-### Step 6. Review and check for Errors
-Create a title for your results that matches the scorecard results that have been requested from your analysis. Check titles and output print adequately and are legible. Thank you for reading.
+### Step 6. Review and check for errors
+Create a title for your results that adequately describes your analysis. Review your output - are results sensible? Check knitted output, writing, and formatting for legibility. Thank you for reading. Please feel free to make changes and provide feedback for this manual.
 
 
