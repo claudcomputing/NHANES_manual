@@ -12,13 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-## Manual for Visualizing how the Relationship between Blood Pressure and Risk for Heart Attack Varies by Race for Women Ages 50 and Above”
+### Manual for Visualizing Risk for Heart Attack by Race for Women Ages 50 and Above
 
 
-### Objective
-This Health Equity Institute of Research (HEIR) manual is intended to serve as a reference for junior analysts on how to perform routine data analyses for the website to help inform health policy for Health Equity Org. It includes training to help analysts like yourself perform some basic data cleaning, analysis, and visualization methods in R. In this manual, we will be producing statistics from NHANES for our female heart health scorecard, looking closely at women above age 50 and examining how race interacts with high blood pressure and risk for heart attack.
+#### Objective
+This Health Equity Institute of Research (HEIR) manual is a reference for reproducible NHANES analyses relating to Heart Health Equity. It includes training to help analysts perform some basic data cleaning, analysis, and visualization methods in R with an eye toward reproducibility and basic instructions on frequently used packages at HEIR. In this analysis manual, we will be producing statistics from NHANES on female heart health, looking closely at women above age 50 and examining how race interacts with risk for heart attack.
 
-### Step 0. Environment set up
+#### Step 0. Environment set up
 ```{r, echo=TRUE,results="hide"}
 if(!requireNamespace("here"))
   install.packages("here", repos = "https://cloud.r-project.org")
@@ -50,22 +50,16 @@ source(here("src", "script.R"))
 packrat::init
 ```
 
-### Step 1. Open, read in, and subset data for population 
-We will use data from the Center for Disease Control's National Health and Nutrition Examination Survey II (NHANES II) for this assignment. A Stata version of this dataset can be found at http://www.stata-press.com/data/r14/nhanes2.dta (here). For the purposes of this analysis,we are not required to use the survey weights. We use read data 13 to read in Stata 13 data from the online location, save the attributes so we can quickly view the variable labels here in conjunction with NHANES documentation. 
+#### Step 1. Open, read in, and subset data for population 
+1. We will use data from the Center for Disease Control's National Health and Nutrition Examination Survey II (NHANES II) for this analysis. Up to date data can be found at http://www.stata-press.com/data/r14/nhanes2.dta (here). This is an unweighted analysis. We use readdata13 to read in Stata data from the website and save the attributes so we can quickly view the variable labels in R in conjunction with online NHANES documentation. We then subselect from the data as a whole using base R to arrive at our population of interest, women over age at or above age 50. 
 
 ```{r, echo=TRUE}
 nhanes <- read.dta13("http://www.stata-press.com/data/r14/nhanes2.dta")
 var.labels <- attr(data, "var.labels")
-```
-
-We then subselect from he data as a whole using base R to arrive at our population of interest, women over age at or above age 50. 
-
-```{r}
 nhanes <- nhanes[nhanes$female==1 & nhanes$age>=50,]
 ```
 
-### Step 2. Create summary NHANES race and heart health statistics table
-
+#### Step 2. Create summary NHANES race and heart health statistics table
 2. Create a summary table or figure with descriptive statistics for five variables that relate to heart disease stratified by race. In particular, we generate mean, standard deviation, median, min, max, and cross tabulated frequencies for heart attack, high blood pressure, age, diabetes, and body mass index.
 
 ```{r}
@@ -83,13 +77,13 @@ table1(~heartatk + highbp + age + diabetes + bmi| race,data=nhanes)
 ```
 
 
-### Step 3. Describe NHANES heart health variables table
-3. Provide a brief description of what the table/figure shows you. We recommend an intuitive check to see if your results make sense given your health equity content and knowledge, by practicing guessing at what your output could look like and then investigating what results actually show. Describe your results specifically and use in text figures where possible. While we include minimum and maximum for binary variables in this table as part of our quality checking process, note that this part of the table is not exported into the published scorecard.
+#### Step 3. Describe NHANES heart health variables table
+3. Provide a brief description of the table you have generated. We recommend an intuitive check to see if your results make sense using your health equity content and knowledge and common sense. One way to practice this is to guess at what your output could look like, developing detached hypotheses, and then interpreting actual results. Describe your results using general trends such as compare and contrast and pattern-finding, and use in-text figures where possible (e.g. Suzy ran a faster mile time than Joe [6 versus 7 minute miles, respectively]). While we include minimum and maximum for binary variables in this table as part of our data quality checking process, note that this part of the table is not exported into the published scorecard.
 
-Description: In the results contained in Table 1, we see that even though black women, white women, and women of other race/ethnicity groups at or above age 50 have similar average ages (ranging from about 62 to about 63, with standard deviations exceeding their range), white women have the lowest rates of heart attacks (.05 vs. .08). High blood pressure rates are 18 percent higher among black women compared to white women in this sample, and 8 percent higher among other race women compared to white women. Diabetes rates are highest among black women at 13.3%, nearly double those of white women and other women, and while all three race groups have BMI averages within one standard deviation of the "healthy" range, women in other race groups fall within the maximum of the healthy range at 24.5, compared to black and white women (29.2 and 26.4, respectively). We note that the sample size 40 for other race groups is quite small. 
+Description: In the results contained in Table 1, we see that even though black women, white women, and women of other race/ethnicity groups at or above age 50 have similar average ages and age distributions (ranging from about 62 to about 63, with standard deviations exceeding the difference between them), white women have the lowest rates of heart attacks (.05 vs. .08). High blood pressure rates are 18 percent higher among black women compared to white women in this sample, and 8 percent higher among other race women compared to white women. Diabetes rates are highest among black women at 13.3%, nearly double those of white women and other women, and while all three race groups have BMI averages within one standard deviation of the "healthy" range, women in other race groups fall within the maximum of the healthy range at 24.5, compared to black and white women (29.2 and 26.4, respectively). We note that the sample size 40 for other race groups is quite small and we will exclude this group for the subsequent graphical analysis. 
 
-### Step 4. Women's heart health by race equity plot
-4. Perform an equity analysis using a visualization that will be useful to our organization's scorecard reporting on racial disparities in heart disease for women across all ages. Note we are returning to the full data set and subselecting women of all ages to view heart attack risk across all ages. We will be using dplyr and ggplot with colors, as a means to introduce you to two versatile and beloved packages.
+#### Step 4. Women's heart health by race equity plot
+4. Perform an equity analysis using a visualization that will be useful to HEIR's scorecard reporting on racial disparities in heart disease for women ages 50 and over. Note we are returning to the full data set and subselecting our sample again to show you another way to manipulate data using dplyr and tidyr. We will be using dplyr and ggplot, as a means to introduce you to two versatile and beloved packages. Welcome to ggplot R visualization heaven and the magical tidyverse. Time permitting, explore the dataset with additional health equity questions. Can you redesign this step to examine relationships between systolic blood pressure or high blood pressure rates, or across other populations, such as rural and urban?
 
 
 ```{r}
@@ -128,14 +122,16 @@ ggplot(spreaddata, aes(x=Black, y=White))+
 ```
 
 
-### Step 5. Bundle for easy reproducibility
+#### Step 5. Bundle for easy reproducibility
 5. Bundle this using packrat using ::bundle, just as you did ::init at start.
 
 ```{r, echo=TRUE, results = "hide"}
 packrat::bundle
 ```
 
-### Step 6. Review and check for errors
-Create a title for your results that adequately describes your analysis. Review your output - are results sensible? Check knitted output, writing, and formatting for legibility. Thank you for reading. Please feel free to make changes and provide feedback for this manual.
+#### Step 6. Review, check for errors, and share
+6. Create a title for your results that adequately describes your analysis. Review your output - are results sensible? Check knitted output, writing, and formatting for legibility. Bonus points if you can implement a shareable version control system such as github alongside packrat. Share your results.
+
+Thank you for reading. Please feel free to make changes and provide feedback on this manual.
 
 
