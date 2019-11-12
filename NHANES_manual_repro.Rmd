@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This Health Equity Institute of Research (HEIR) manual is a reference for reproducible NHANES analyses relating to Heart Health Equity. It includes training to help analysts perform some basic data cleaning, analysis, and visualization methods in R with an eye toward reproducibility and basic instructions on frequently used packages at HEIR. In this analysis manual, we will be producing statistics from NHANES on female heart health, looking closely at women above age 50 and examining how race interacts with risk for heart attack.
 
 #### Step 0. Environment set up
+0. We load necessary packages and run source code from R script to set up packrat, a reproducibility system that will allow adequate archival reference of this code and analysis.
 ```{r, echo=TRUE,results="hide"}
 if(!requireNamespace("here"))
   install.packages("here", repos = "https://cloud.r-project.org")
@@ -47,7 +48,6 @@ library("ggplot2")
 
 source(here("src", "script.R"))
 
-packrat::init
 ```
 
 #### Step 1. Open, read in, and subset data for population 
@@ -127,6 +127,7 @@ ggplot(spreaddata, aes(x=Black, y=White))+
 
 ```{r, echo=TRUE, results = "hide"}
 packrat::bundle
+source(here("src", "script2.R"))
 ```
 
 #### Step 6. Review, check for errors, and share
