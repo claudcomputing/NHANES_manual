@@ -34,6 +34,13 @@ if(!requireNamespace("readstata13"))
   install.packages("readstata13", repos = "https://cloud.r-project.org")
 library("readstata13")
 
+if(!requireNamespace("dplyr"))
+ install.packages("dplyr", repos = "https://cloud.r-project.org")
+library("dplyr")
+
+if(!requireNamespace("tidyr"))
+ install.packages("tidyr", repos = "https://cloud.r-project.org")
+library("tidyr")
 source(here("src", "script.R"))
 
 packrat::init
@@ -82,13 +89,13 @@ Description: In the results contained in Table 1, we see that even though black 
 
 
 ```{r}
-nhanes <- read.dta13("http://www.stata-press.com/data/r14/nhanes2.dta")
+nhanes <- 
 
 # Subsetting and reshaping the life expectancy data
-subdata <- life_expectancy  %>% 
-    filter (Year=="2000-2005")%>%
-    subset(select=c(Country.or.Area,Subgroup,Value))%>%
-    spread( key = Subgroup, value=Value)
+subdata <- read.dta13("http://www.stata-press.com/data/r14/nhanes2.dta")  %>% 
+    filter ((race == "white" | race = "black")& (sex=="female"))%>%
+    subset(select=c(heartatk,race,age))%>%
+    spread( key = c(race,age), value=Value)
     
 
 # Taking a look at the first few rows
